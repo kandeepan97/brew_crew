@@ -1,4 +1,5 @@
 import 'package:brew_crew/services/auth.dart';
+import 'package:brew_crew/shared/loading.dart';
 import 'package:flutter/material.dart';
 
 
@@ -15,6 +16,8 @@ class _RegisterState extends State<Register> {
 
 final AuthService _auth = AuthService();
 final _formkey = GlobalKey<FormState>();
+  bool loading = false;
+
 
  String email = "";
  String password = "";
@@ -24,7 +27,7 @@ final _formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return loading ? Loading() : Scaffold(
       backgroundColor: Colors.brown[100],
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
@@ -47,6 +50,17 @@ final _formkey = GlobalKey<FormState>();
               children: <Widget>[
                 SizedBox(height:20.0),
                 TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    fillColor: Colors.white,
+                    filled: true,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white,width: 2.0)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.pink,width: 2.0)
+                      )
+                  ),
                   validator: (val) =>val.isEmpty ?'Enter a email' : null,
                   onChanged:(val){
                    setState(() => email = val);
@@ -54,6 +68,17 @@ final _formkey = GlobalKey<FormState>();
                 ),
                 SizedBox(height:20.0),
                 TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    fillColor: Colors.white,
+                    filled: true,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white,width: 2.0)
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.pink,width: 2.0)
+                      )
+                  ),
                   validator: (val) =>val.length < 6 ?'Password should contain atleast 6 chars' : null,
                   obscureText: true,
                   onChanged:(val){
@@ -69,9 +94,11 @@ final _formkey = GlobalKey<FormState>();
                   ),
                   onPressed: () async {
                     if(_formkey.currentState.validate()){
+                      setState(() => loading = true);
                      dynamic result =await _auth.registerWithEmailAndPassword(email, password);
                      if(result == null){
                        setState(() => error = 'please supply a valid email');
+                       loading = false;
                      }
                     }
                 }),
